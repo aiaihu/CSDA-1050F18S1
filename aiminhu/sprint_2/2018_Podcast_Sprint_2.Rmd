@@ -1,0 +1,1289 @@
+---
+title: "Canadian Podcast Listeners 2018 Data Analyzing - Sprint 2"
+author: "Aimin Amy Hu"
+date: '2019-07-24'
+output: pdf_document
+always_allow_html: yes
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+```{r message=FALSE, warning=FALSE, results ='hide'}
+#start by loading some libraries
+library(data.table)
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+library(stringr)
+library(DT)
+library(knitr)
+library(grid)
+library(gridExtra)
+library(corrplot)
+library(methods)
+library(Matrix)
+library(reshape2)
+library(kableExtra)
+```
+
+```{r}
+#set up working directory - this will set the working directory to the same folder as your R studio RMD file - ensure that the CSVs outlined below are also in this folder
+set_wd <- function() {
+library(rstudioapi) # make sure you have it installed
+current_path <- getActiveDocumentContext()$path 
+setwd(dirname(current_path ))
+print( getwd() )
+}
+```
+```{r}
+# Read  CSV files along with header and replace empty values with "NA" when read the CSV file.
+
+listener_df <- fread("podcast18.csv",header = TRUE,na.strings = c("") )
+
+```
+```{r}
+#remove columns with all values are NA
+listener_clean <-Filter(function(x) !(all(x=="")), listener_df)
+```
+
+```{r global_options, include=FALSE}
+knitr::opts_chunk$set(warning = FALSE, message = FALSE)
+```
+# Sprint_2
+
+This is continue work from Sprint_1
+
+# Part 3: Data Visualization
+
+
+In this section, I will use ggplots package from R to plot some graphics of this dataset. This will help us to understand the data better through visualzation.
+
+#### A: Visualization of respondent gender distribution
+
+arfgen: gender
+
+```{r}
+ggplot(listener_clean,aes(x=arfgen, fill=arfgen))+
+  theme_bw()+
+  geom_bar()+
+  labs(y="Respondent Count",
+       title="Respondent by Gender")
+
+```
+
+##### Observation from above plot:
+There are about 910 males and 625 females among 1534 listeners.
+
+#### B: Visualization of respondent age distribution
+
+arfagerf: age
+
+```{r}
+
+ggplot(listener_clean,aes(x=arfagerf, fill=arfagerf))+
+  theme_bw()+
+  geom_bar()+
+  labs(y="Respondent Count",
+       title="Respondent by age")
+```
+
+##### Observation from the plot
+
+1: Age group of 25 to 34 has higher number of listeners among all age groups. This might tell us some insight information such as:
+  + Listeners in this age group, has more leisure time to spend.
+  + Tend to use computer or phone more time.To understand them more, we will need to have futher analysising combine with other variables.
+
+2: There are just few listeners under age 18. This might be:
+  + People under age 18 might not be interested in podcast or there are not much podcast programs are for this group?
+
+  + Might not consider this group as a survey group?
+
+3: This plot is clearly telling us age distribution for all 1534 respondents.
+
+#### C:Visualization of respondent's gender and age distribution. Do a combination of gender and age plot to see the distribution
+
+arfgen: gender
+arfagerf: age
+
+```{r}
+
+ggplot(listener_clean,aes(x=arfagerf, fill=arfgen))+
+  theme_bw()+
+  geom_bar()+
+  labs(y="Respondent Count",
+       title="Respondent by age")
+
+```
+
+##### Observation from the plot
+1: Respondents in age group of 25 to 34 are the most respondents group in both male and female groups.
+2: The second age group with more respondents is age 45 to 54 in both male and female groups.
+3: The 3rd group is  age 35 to 44 in both male and female groups.
+4: In female group, respondents in age group of 18 to 24 are almost same to respondents in age group of 65+. Respondents in age group of 55 to 64 is slightly higher than respondents in age group of 18 to 24.
+5: In male group, respondents in age 18 to 24, in age 55 to 64 and in age 65+ are almost same numbers.
+6: There are a few respondents under 18 in male group.
+
+#### D: Visualization of respondent's household size distribution
+
+arfhhs: household size
+
+
+```{r}
+
+ggplot(listener_clean,aes(x=arfhhs, fill =arfhhs))+
+  theme_bw()+
+  geom_bar()+
+  labs(y="Respondent Count",
+       title="Respondent by household size")
+
+```
+
+##### Observation from the plot
+1:Among the 1534 respondents, there are 500 respondents with household size 2. They might be married couples without kids.
+2: There are about 290 respondents with household size 1. They might be singles.
+3: There are about 260 respondents with household size 3. They might be married couples with one kid.
+4: There are about 230 respondents with household size 4. They might be married coupples with 2 kids.
+5: There are about 190 respondents did not give household size information.
+
+#### E: Visualzation of Combine Household size abd Kids in Household for Analyzing
+
+arfhhs: household size
+arfkid: kids in household
+
+```{r}
+
+ggplot(listener_clean,aes(x=arfhhs, fill =arfkid))+
+  theme_bw()+
+  geom_bar()+
+  labs(y="Respondent Count",
+       title="Respondent by Kids in Household")
+
+```
+
+#### F: Visualzation of respondents' edcuation level
+
+arfeduc: highest education
+
+```{r}
+
+ggplot(listener_clean,aes(x=arfeduc, fill =arfeduc))+
+  theme_bw()+
+  geom_bar()+
+  labs(y="Respondent Count",
+       title="Respondent by Highest Education")
+
+```
+
+##### Observation from the plot
+
+1: The hightest number of respondents is 410 with University undergraduate degree.
+2: The second hightest number of respondents is 300 with Completed college/technical school.
+3: There are about 260 respondents who have Post-graduate degree.
+4: There are about 250respondents with High school graduate or Some high school or Elementary/grade school.
+
+#### G: Visualzation of respondents' Work Status
+
+arfwork: work status
+
+```{r}
+
+ggplot(listener_clean,aes(x=arfwork, fill =arfwork))+
+  theme_bw()+
+  geom_bar()+
+  labs(y="Respondent Count",
+       title="Respondent by Work Status")
+
+```
+
+##### Observation from the plot
+
+1:More than 55%  of respondents (is about 890 people) are employed/self-employed full-time.
+2:There are about 190 respondents are employed/self-employed part-time.
+3: About 190 respondents are retired.
+4: About 110 respondents are full-time student.
+
+#### H: Visualzation of respondents' Household Income Before Tax
+
+arfhhi: household income before tax
+
+```{r}
+
+ggplot(listener_clean,aes(x=arfhhi, fill =arfhhi))+
+  theme_bw()+
+  geom_bar()+
+  labs(y="Respondent Count",
+       title="Respondent by Household Income Before Tax")
+
+```
+
+##### Observation from the plot
+
+1:There are only about 90 respondents has household income less than $25k.
+2: There are about 190 respondents who selected "Don't know/prefer not to say".
+3: Majority of respondents have household income fall into $50k - $75k, $75k - $100k and $100k - $125k.
+
+#### I: Visualzation of geographic of Listeners
+
+arfrr: region
+arfpr: province
+
+There are two attributes but recorded same data. Hence, I will use arfrr(region) for the plot.
+
+
+```{r}
+
+ggplot(listener_clean,aes(x=arfrr, fill =arfrr))+
+  theme_bw()+
+  geom_bar()+
+  labs(y="Respondent Count",
+       title="Respondent by Region")
+
+```
+
+##### Observation from the plot
+
+1: With no surprise, Ontario has more respondents than any other region in Canada.
+2: Terrritories has least respondents, just few respondents there.
+
+
+#### J: Visualization of Respondents' Recency
+
+I will look at below 3 attributes:
+
+qp4nma: specific podcasts listened to in past month
+qp4tya : type of podcasts listened to in past month
+qp4gnaa: genres of podcasts listened to in past month
+
+##### 1: Visualzation of Specific podcasts listened to in past month (qp4nma)
+
+qp4nma: specific podcasts listened to in past month
+
+
+* All values in this variable are string, we will use "group_by" function to group the podcast name together, then to check how many podcasts were listened by the 1534 listeners in past month.
+```{r}
+podcast_group <- group_by(listener_clean,qp4nma)
+
+podcast_last_month <- summarize(podcast_group, podcast_count = n())
+
+```
+
+###### top 10 podcasts listened among all the listeners
+
+```{r}
+podcast_last_month %>% 
+  arrange(-podcast_count) %>% 
+  filter(qp4nma !="Don't know" & qp4nma !="N/A, None") %>% # not include qp4nma ="Don't know" and NA
+  top_n(10,wt = podcast_count) %>% 
+  select(qp4nma, podcast_count) %>% 
+  datatable(class = "nowrap hover row-border", escape = FALSE, options = list(dom = 't',scrollX = TRUE, autoWidth = FALSE))
+
+```
+
+* We see there are top podcasts that respondents selected on the survey. However, the top 3 among the top 10 are not a really podcasts. There are 105 respondents answered with "Other/Unknown Podcast". There 89 respondents answered with" N/A, None" and 70 respondents answered with " Don't Know".
+
+##### 2: Visualization of Type of podcasts listened to in past month (qp4tya)
+
+qp4tya : type of podcasts listened to in past month
+
+
+* All values in this variable are string, we will use "group_by" function to group the type of podcasts together, then to check how many types of podcasts were listened by the 1534 listeners in past month.
+
+
+```{r}
+#Check if there are any missing values in variable qp4tya
+sum(is.na(listener_clean$qp4tya))
+
+```
+
+There are 43 missing values. These missing values could be no answers from the respondents. We  will combine with qp4nma to determine how we are going to deal with these 43 NA's.
+
+
+```{r}
+# use select() to get a subset with only two columns. This is just for easy checking out these two columns.
+data_last_month <- select(listener_clean, qp4nma, qp4tya)
+```
+
+```{r}
+data_last_month[is.na(data_last_month$qp4tya),]
+```
+
+We combined columns qp4nma and qp4tya to determine the NA's in variable qp4tya. We saw a few records with podcast names in variable qp4nma, but no values in variable qp4tya. We used podcast names to check online and found out which type is and replaced the NA with actual type of podcast.
+
+Replace NA's with actual type in listener_clean data
+
+```{r}
+#Replace NA's with actual genre in listener_clean data
+listener_clean[is.na(listener_clean$qp4tya) &listener_clean$qp4nma =="ZENandTECH","qp4tya"]<-"Episodic"
+
+```
+```{r}
+listener_clean[is.na(listener_clean$qp4tya) &listener_clean$qp4nma =="CBS Sports NY","qp4tya"]<-"Episodic"
+```
+
+```{r}
+listener_clean[is.na(listener_clean$qp4tya) &listener_clean$qp4nma =="Triforce!","qp4tya"]<-"Episodic"
+```
+```{r}
+listener_clean[is.na(listener_clean$qp4tya) &listener_clean$qp4nma =="NPR (unspec.)","qp4tya"]<-"No show type given"
+```
+```{r}
+listener_clean[is.na(listener_clean$qp4tya) &listener_clean$qp4nma =="The Crisis of Civilization Podcast","qp4tya"]<-"Episodic"
+```
+```{r}
+listener_clean[is.na(listener_clean$qp4tya) &listener_clean$qp4nma =="Radio-Canada (unspec.)","qp4tya"]<-"No show type given"
+```
+```{r}
+listener_clean[is.na(listener_clean$qp4tya) &listener_clean$qp4nma =="The Mike Alkin Show: Talking Stocks Over a Beer","qp4tya"]<-"Episodic"
+```
+
+```{r}
+listener_clean[is.na(listener_clean$qp4tya) &listener_clean$qp4nma =="The Debaters with Steve Patterson","qp4tya"]<-"Serial"
+```
+
+```{r}
+listener_clean[is.na(listener_clean$qp4tya) &listener_clean$qp4nma =="The Next Chapter from CBC Radio","qp4tya"]<-"Episodic"
+```
+
+After replaced some NA's, check how many NA's values in variable qp4tya
+```{r}
+sum(is.na(listener_clean$qp4tya))
+
+```
+
+For the rest of NA's in variable qp4tya, we will keep them as NA's as there are no podcast names in variable qp4nma.
+
+
+```{r}
+type_group <- group_by(listener_clean,qp4tya)
+
+type_last_month <- summarize(type_group, type_count = n())
+
+```
+```{r}
+type_last_month
+```
+
+We can use ggplot to create a pie chart to visualize it.
+
+```{r}
+data <- listener_clean %>% 
+  group_by(qp4tya) %>% 
+  count() %>% 
+  ungroup() %>% 
+  mutate(per=`n`/sum(`n`)) %>% 
+  arrange(desc(qp4tya))
+data$label <- scales::percent(data$per)
+ggplot(data=data)+
+  geom_bar(aes(x="", y=per, fill=qp4tya), stat="identity", width = 1)+
+  coord_polar("y", start=1)+
+  theme_void()+
+  geom_text(aes(x=1, y = cumsum(per) - per/2, label=label))
+```
+
+From above pie chart, we see 60% of respondents did not give show type for their listening in the past month on the survey form. 35.3% of respondents listened to Episodic podcasts in the past month. 2.4% of respondents were listening on Serial podcasts in the last month and 2.2% of respondents with NA.
+
+##### 3:Visualization of Genres of podcasts listened to in past month(qp4gnaa)
+
+qp4gnaa: genres of podcasts listened to in past month
+
+
+
+```{r}
+#Check if there are any missing values in variable qp4gnaa
+sum(is.na(listener_clean$qp4gnaa))
+
+```
+
+```{r}
+# use select() to get a subset with only two columns. This is just for easy checking out these two columns.
+data_genres <- select(listener_clean, qp4nma, qp4gnaa)
+```
+
+```{r}
+data_genres[is.na(data_genres$qp4gnaa),] 
+
+```
+
+From above data, we saw there are podcast name in variable qp4nma but no values in qp4gnaa. We will check online to find actual genre and replace the NA's.
+
+Replace NA's with actual type in listener_clean data
+
+```{r}
+# Replace NA's with "Not recorded" for qp4nma =="CBC (unspec.)". Due to no specific podcast program name, it is hard to determine their genre. Therefore, we put "Not recorded".
+
+listener_clean[is.na(listener_clean$qp4gnaa) &listener_clean$qp4nma =="CBC (unspec.)","qp4gnaa"]<-"Not recorded"
+```
+```{r}
+# Replace NA's with actual genre
+listener_clean[is.na(listener_clean$qp4gnaa) &listener_clean$qp4nma =="ZENandTECH","qp4gnaa"]<-"Alternative Health"
+```
+```{r}
+# Replace NA's with actual genre
+listener_clean[is.na(listener_clean$qp4gnaa) &listener_clean$qp4nma =="Food Psych","qp4gnaa"]<-"Health"
+```
+```{r}
+# Replace NA's with actual genre
+listener_clean[is.na(listener_clean$qp4gnaa) &listener_clean$qp4nma =="La Chapelle - podcast audio","qp4gnaa"]<-"Christianity"
+```
+```{r}
+# Replace NA's with actual genre
+listener_clean[is.na(listener_clean$qp4gnaa) &listener_clean$qp4nma =="CBS Sports NY","qp4gnaa"]<-"Sports & Recreation"
+```
+
+```{r}
+# Replace NA's with actual genre
+listener_clean[is.na(listener_clean$qp4gnaa) &listener_clean$qp4nma ==" The Daily Shoah!","qp4gnaa"]<-"Society & Culture"
+```
+```{r}
+# Replace NA's with actual genre
+listener_clean[is.na(listener_clean$qp4gnaa) &listener_clean$qp4nma =="The Daily Shoah!","qp4gnaa"]<-"Society & Culture"
+```
+
+```{r}
+# Replace NA's with actual genre
+listener_clean[is.na(listener_clean$qp4gnaa) &listener_clean$qp4nma =="Triforce!","qp4gnaa"]<-"Games & Hobbies"
+```
+```{r}
+# Replace NA's with actual genre
+listener_clean[is.na(listener_clean$qp4gnaa) &listener_clean$qp4nma =="Comedy Bang Bang","qp4gnaa"]<-"Comedy"
+```
+```{r}
+# Replace NA's with actual genre
+listener_clean[is.na(listener_clean$qp4gnaa) &listener_clean$qp4nma =="10/3: Canadian News Covered","qp4gnaa"]<-"News & Politics"
+```
+```{r}
+# # Replace NA's with "Not recorded" for qp4nma =="NPR (unspec.)". Due to no specific podcast program name, it is hard to determine their genre. Therefore, we put "Not recorded"
+listener_clean[is.na(listener_clean$qp4gnaa) &listener_clean$qp4nma =="NPR (unspec.)","qp4gnaa"]<-"Not recorded"
+```
+```{r}
+# Replace NA's with actual genre
+listener_clean[is.na(listener_clean$qp4gnaa) &listener_clean$qp4nma =="Dr. Laurie Marbas Podcast","qp4gnaa"]<-"Health"
+```
+```{r}
+# Replace NA's with actual genre
+listener_clean[is.na(listener_clean$qp4gnaa) &listener_clean$qp4nma =="As Maple As","qp4gnaa"]<-"National"
+```
+```{r}
+# Replace NA's with actual genre
+listener_clean[is.na(listener_clean$qp4gnaa) &listener_clean$qp4nma =="Corde sensible - Radical","qp4gnaa"]<-"Personal Journals"
+```
+
+```{r}
+# Replace NA's with "Not recorded" for qp4nma =="Radio-Canada (unspec.)". Due to no specific podcast program name, it is hard to determine their genre. Therefore, we put "Not recorded"
+listener_clean[is.na(listener_clean$qp4gnaa) &listener_clean$qp4nma =="Radio-Canada (unspec.)","qp4gnaa"]<-"Not recorded"
+```
+
+
+
+```{r}
+# Replace NA's with actual genre
+listener_clean[is.na(listener_clean$qp4gnaa) &listener_clean$qp4nma =="Big Brother Reviews & After Show","qp4gnaa"]<-"TV & Film"
+```
+
+```{r}
+# Replace NA's with actual genre
+listener_clean[is.na(listener_clean$qp4gnaa) &listener_clean$qp4nma =="American Fiasco","qp4gnaa"]<-"Sports & Recreation"
+```
+
+```{r}
+# Replace NA's with actual genre
+listener_clean[is.na(listener_clean$qp4gnaa) &listener_clean$qp4nma =="BrainStuff","qp4gnaa"]<-"Science & Medicine"
+```
+
+```{r}
+# Replace NA's with actual genre. Checked online and found "Casefile True Crime Podcast" belongs "True crime" genre. However, refer to Dictionary CdnPodcast2018 Final Client file, there is no "True crime" genre listed. Hence, we will use "Other" as its genre.
+listener_clean[is.na(listener_clean$qp4gnaa) &listener_clean$qp4nma =="Casefile True Crime Podcast","qp4gnaa"]<-"Other"
+```
+
+```{r}
+# Replace NA's with actual genre
+listener_clean[is.na(listener_clean$qp4gnaa) &listener_clean$qp4nma =="À voix haute","qp4gnaa"]<-"Kids & Family"
+```
+
+```{r}
+# Replace NA's with actual genre
+listener_clean[is.na(listener_clean$qp4gnaa) &listener_clean$qp4nma =="Oprah's SuperSoul Conversations","qp4gnaa"]<-"Society & Culture"
+```
+
+```{r}
+# Replace NA's with actual genre
+listener_clean[is.na(listener_clean$qp4gnaa) &listener_clean$qp4nma =="The Crisis of Civilization Podcast","qp4gnaa"]<-"News & Politics"
+```
+
+```{r}
+# Replace NA's with "Not recorded" for qp4nma =="Radio-Canada (unspec.)". Due to no specific podcast program name, it is hard to determine their genre. Therefore, we put "Not recorded"
+listener_clean[is.na(listener_clean$qp4gnaa) &listener_clean$qp4nma =="Radio-Canada (unspec.)","qp4gnaa"]<-"Not recorded"
+```
+
+```{r}
+# Replace NA's with actual genre
+listener_clean[is.na(listener_clean$qp4gnaa) &listener_clean$qp4nma =="The Mike Alkin Show: Talking Stocks Over a Beer","qp4gnaa"]<-"Business"
+```
+
+```{r}
+# Replace NA's with actual genre
+listener_clean[is.na(listener_clean$qp4gnaa) &listener_clean$qp4nma =="EW Morning Live","qp4gnaa"]<-"TV & Film"
+```
+
+```{r}
+# Replace NA's with actual genre
+listener_clean[is.na(listener_clean$qp4gnaa) &listener_clean$qp4nma =="The Debaters with Steve Patterson","qp4gnaa"]<-"TV & Film"
+```
+
+```{r}
+# Replace NA's with actual genre
+listener_clean[is.na(listener_clean$qp4gnaa) &listener_clean$qp4nma =="Dreamland","qp4gnaa"]<-"Podcasting"
+```
+
+```{r}
+# Replace NA's with actual genre
+listener_clean[is.na(listener_clean$qp4gnaa) &listener_clean$qp4nma =="James MacDonald - Walk in the Word Audio","qp4gnaa"]<-"Christianity"
+```
+
+```{r}
+# Replace NA's with actual genre
+listener_clean[is.na(listener_clean$qp4gnaa) &listener_clean$qp4nma =="Dead Rock Stars","qp4gnaa"]<-"Society & Culture"
+```
+
+```{r}
+# Replace NA's with actual genre
+listener_clean[is.na(listener_clean$qp4gnaa) &listener_clean$qp4nma =="The Gossip Garden Podcast","qp4gnaa"]<-"Games & Hobbies"
+```
+
+```{r}
+# Replace NA's with actual genre
+listener_clean[is.na(listener_clean$qp4gnaa) &listener_clean$qp4nma =="Dekmantel","qp4gnaa"]<-"Podcasting"
+```
+
+```{r}
+# Replace NA's with actual genre
+listener_clean[is.na(listener_clean$qp4gnaa) &listener_clean$qp4nma =="A New and Ancient Story: The Podcast","qp4gnaa"]<-"Philosophy"
+```
+
+```{r}
+# Replace NA's with actual genre
+listener_clean[is.na(listener_clean$qp4gnaa) &listener_clean$qp4nma =="Crazy/Genius","qp4gnaa"]<-"Technology"
+```
+
+```{r}
+# Replace NA's with actual genre
+listener_clean[is.na(listener_clean$qp4gnaa) &listener_clean$qp4nma =="Doc Mailloux et Josey","qp4gnaa"]<-"Podcasting"
+```
+
+```{r}
+# Replace NA's with actual genre
+listener_clean[is.na(listener_clean$qp4gnaa) &listener_clean$qp4nma =="Bright Side Podcast","qp4gnaa"]<-"Arts"
+```
+
+```{r}
+# Replace NA's with actual genre
+listener_clean[is.na(listener_clean$qp4gnaa) &listener_clean$qp4nma =="CareerJoy","qp4gnaa"]<-"Self-Help"
+```
+
+```{r}
+# Replace NA's with actual genre
+listener_clean[is.na(listener_clean$qp4gnaa) &listener_clean$qp4nma =="LCT Platform Talks","qp4gnaa"]<-"Arts"
+```
+
+```{r}
+# Replace NA's with actual genre
+listener_clean[is.na(listener_clean$qp4gnaa) &listener_clean$qp4nma =="A Prairie Home Companion","qp4gnaa"]<-"Comedy"
+```
+
+```{r}
+# Replace NA's with actual genre
+listener_clean[is.na(listener_clean$qp4gnaa) &listener_clean$qp4nma =="The Next Chapter from CBC Radio","qp4gnaa"]<-"Arts"
+```
+
+
+```{r}
+# Replace NA's with actual genre
+listener_clean[is.na(listener_clean$qp4gnaa) &listener_clean$qp4nma =="Baeltestedet","qp4gnaa"]<-"Comedy"
+```
+
+We have replaced the actual genre for all NA's which have podcast names in variable qp4nma. Now, we will check how many NA's after the replacement.
+```{r}
+sum(is.na(listener_clean$qp4gnaa))
+
+```
+
+Run below codes to check if there are still some NA's needed to be replaced by actual genre.
+```{r}
+# use select() to get a subset with only two columns. This is just for easy checking out these two columns.
+data_genres <- select(listener_clean, qp4nma, qp4gnaa)
+```
+
+```{r}
+data_genres[is.na(data_genres$qp4gnaa),] 
+
+```
+
+There are still 35 NAs in variable qp4gnaa. Since respondents did not select/list podcast names in variable qp4nma, I will just keep these 35 NAs in the data.
+
+##### use group_by genres of podcasts to see how many genres of podcasts in the data.
+
+```{r}
+# use group_by genres of podcasts to see how many genres of podcasts in the data.
+genres_group <- group_by(listener_clean,qp4gnaa)
+
+genres_last_month <- summarize(genres_group, number_of_podcasts = n())
+
+```
+
+
+
+```{r}
+##Top 10 genres (command it out due to an issue for knit to PDF file)
+#genres_last_month %>% 
+ # arrange(-number_of_podcasts) %>% 
+ # filter(qp4gnaa !="Not recorded" & qp4gnaa !="") %>% # not include qp4gnaa ="Not recorded" and NA
+ # top_n(10,wt = number_of_podcasts) %>% 
+ # select(qp4gnaa, number_of_podcasts) %>% 
+ # datatable(class = "nowrap hover row-border", escape = FALSE, options = list(dom = 't',scrollX = TRUE, autoWidth #= FALSE,format = 'latex' ))
+
+```
+
+##### Visualization of Top 10 genres Between Male and Female
+arfgen: gender
+qp4gnaa: genres of podcasts listened to in past month
+
+
+
+```{r}
+# Group_by genres of podcasts by male
+p_male <- listener_clean %>%
+   group_by_(.dots=c("arfgen","qp4gnaa")) %>%
+   summarize(number_of_listeners = n(), number_of_podcasts = n()) %>%
+  arrange(-number_of_podcasts,-number_of_listeners) %>%
+  filter(qp4gnaa !="Not recorded" & qp4gnaa !="") %>% # not include qp4gnaa ="Not recorded" and NA
+  top_n(10,wt = number_of_podcasts) %>%
+  select(arfgen,qp4gnaa) %>%
+  subset(arfgen =="Male") %>%
+  as.data.frame
+```
+
+
+```{r}
+# Group_by genres of podcasts by female
+p_female <- listener_clean %>% 
+   group_by_(.dots=c("arfgen","qp4gnaa")) %>% 
+   summarize(number_of_listeners = n(), number_of_podcasts = n()) %>% 
+  arrange(-number_of_podcasts) %>% 
+  filter(qp4gnaa !="Not recorded" & qp4gnaa !="") %>% # not include qp4gnaa ="Not recorded" and NA
+  top_n(10,wt = number_of_podcasts) %>%
+  select(arfgen,qp4gnaa) %>%
+  subset(arfgen =="Female") %>%
+  as.data.frame
+
+```
+
+
+```{r} 
+
+#Transform tables into grob
+table1 <-tableGrob(p_male)
+table2<-tableGrob(p_female)
+
+# display two tables side by side
+grid.arrange(table1,table2,ncol=2)
+
+```
+
+From above tables, we saw the top 10 genres of podcasts are different between male and female.
+
+#### K: Visualization of Respondents' Frequency
+
+We will look at below 3 attributes:
+qs4: frequency listening to audio podcasts
+
+qp1c: combined time listening typical week
+
+qp3: first started listening to podcasts
+
+
+##### 1:Visualization of Frequency listening to audio podcasts (qs4)
+
+qs4: frequency listening to audio podcasts
+
+Use a pie chart to see percentage of respondents in each type of frenquency listening to audio podcasts.
+
+```{r}
+data <- listener_clean %>% 
+  group_by(qs4) %>% 
+  count() %>% 
+  ungroup() %>% 
+  mutate(per=`n`/sum(`n`)) %>% 
+  arrange(desc(qs4))
+data$label <- scales::percent(data$per)
+ggplot(data=data)+
+  geom_bar(aes(x="", y=per, fill=qs4), stat="identity", width = 1)+
+  coord_polar("y", start=1)+
+  theme_void()+
+  geom_text(aes(x=1, y = cumsum(per) - per/2, label=label))
+```
+
+We can clearly see the distribution of listeners's frenquency.Every day listeners are only 20.1%. Once a month listeners are 10.2% and 2-3 times a month listeners are 18.8%.
+
+##### 2: Visualization of frequency between male and female
+
+arfgen: gender
+qs4: frequency listening to audio podcasts
+
+```{r}
+
+ggplot(listener_clean,aes(x=qs4, fill =arfgen))+
+  theme_bw()+
+  geom_bar()+
+  labs(y="Respondent Count",
+       title="Respondent by Frequency")
+
+```
+
+More male listeners are in all frenquency catergories.
+
+##### 3:Visualization of combined time listening typical week (qp1c)
+
+qp1c: combined time listening typical week
+
+
+```{r}
+#check what kind of information recorded in this variable.
+head(listener_clean$qp1c)
+```
+
+variable qp1c recorded listeners' combined time listning typical week. The numbers in this variable are in minutes. There also have values "DNQ Listen once per week or more". This "DNQ" refers to listeners who were not asked that question because they indicated in the earlier question that they don't listen to podcasts on a weekly basis so were not asked how many minutes they listen to per week. Hence, I will remove these DNQ values from this variable and only analyze listeners who listen to podcasts on a weekly basis.
+
+###### Get a subset dataset without "DNQ" in variable qp1c
+
+```{r}
+# delete rows where qp1c != "DNQ Listen once per week or more"
+listener_combine_time <- filter(listener_clean, qp1c != "DNQ Listen once per week or more")
+```
+###### Get min., mean, and max. for variable qp1c
+
+```{r}
+summary(listener_combine_time$qp1c)
+```
+
+There are 1088 rows in this subset data (446 rows removed). Will need to convert the variable to numeric for getting min., mean, and max.
+
+```{r}
+summary(as.numeric(listener_combine_time$qp1c))
+```
+
+The minimum is 1. I consider this as an error. It could be wrong recorded value as people will not listen to a podcast only for 1 minute.
+
+```{r}
+#check how many qp1c=="1"
+nrow(listener_clean[listener_clean$qp1c=="1"])
+
+```
+
+There are only one record with qp1c=="1", hence I will remove this one record and get min., mean and max. again.
+
+```{r}
+
+listener_combine_time <- filter(listener_combine_time,  qp1c != "1")
+summary(as.numeric(listener_combine_time$qp1c))
+```
+
+Now, the min. is 4 minute in this variable. It might be an error too as people don't use 4 minute to indicate their approximate time. Hence, I will remove this record too from the subset data and get summary again.
+
+
+```{r}
+
+listener_combine_time <- filter(listener_combine_time,  qp1c != "4")
+summary(as.numeric(listener_combine_time$qp1c))
+```
+
+Check how many records for qp1c =="2820"
+
+```{r}
+#check how many qp1c=="2820"
+nrow(listener_clean[listener_clean$qp1c=="2820"])
+
+```
+
+There are 7 records with this number. I am assuming these are correct numbers.
+
+```{r}
+
+ggplot(listener_combine_time,aes(x=qp1c, fill =qp1c))+
+  theme_bw()+
+  geom_bar()+
+  labs(y="Respondent Count",
+       title="Respondent by Combine Time")
+
+```
+
+
+
+
+##### 3: Visualization of first started listening to podcasts(qp3)
+
+qp3: first started listening to podcasts
+
+Use a pie chart to see distribution of listeners in which time to start listening to podcasts.
+ 
+```{r}
+data <- listener_clean %>%
+  group_by(qp3) %>% 
+  count() %>% 
+  ungroup() %>% 
+  mutate(per=`n`/sum(`n`)) %>% 
+  arrange(desc(qp3))
+data$label <- scales::percent(data$per)
+ggplot(data=data)+
+  geom_bar(aes(x="", y=per, fill=qp3), stat="identity", width = 1)+
+  coord_polar("y", start=1)+
+  theme_void()+
+  geom_text(aes(x=1, y = cumsum(per) - per/2, label=label))
+  
+```
+
+
+# Part 4: Subset a dataset with selected variables and id
+
+In the dataset, there are 584 variables. Based on my research questions, I will only focuse on below variables which will be using for th segmentation analyzing.
+
+### Selecting Variables
+
+#### 1:Variables of Demographics of Listeners
+
+arfgen: gender
+arfagerf: age
+arfhhs: household size
+arfkid: kids in household
+arfeduc:highest education
+arfwork: work status
+arfhhi: household income before tax
+
+
+#### 2:Variables of listeners' Recency and Frequency
+
+In thinking about the “what,” we should think about the past, present, and future. What have listeners done, what are they doing, what are they thinking, and what are they likely to do? 
+From the answers to these questions, we learn how our listeners interacted with podcasts in the past. We can comparing this data with the data from other W's, we will be able to indentify the least and most profitable listeners.
+
+##### Attributes for Recency
+
+qp4nma: specific podcasts listened to in past month
+qp4tya : type of podcasts listened to in past month
+qp4gnaa: genres of podcasts listened to in past month
+
+##### Attributes for Frequency
+
+qs4: frequency listening to audio podcasts
+qp1c: combined time listening typical week
+qp3: first started listening to podcasts
+
+#### 3: Variables of how listeners' reacting to ADS.
+
+qa1a: tom1 brands podcst advertising
+qa2aa: attention paid TP podcast ADS
+qza3a: tried to get more info on podcast AD
+
+
+```{r}
+# subset dataset with selected variables + id
+
+data_final <- select(listener_clean, id, arfgen,arfagerf,arfhhs,arfkid,arfeduc,arfwork,arfhhi,qp4nma,qp4tya,qp4gnaa,qs4,qp1c,qp3,qa1a,qa2aa,qza3a)
+
+```
+
+
+# Part 5: Data Analyzing - Segmentation Analyzing
+
+Segmentation provides the knowledge that companies need to tailor their products and services to maximize their profits within each segment.
+
+The analysis of this dataset is expecting to identify more profitable segments for ads.Podcasters can focus their efforts on keeping these listeners happy while increasing their purchases via advertising on the podcasts.
+
+I will use k-Modes Clustering and Hierarchical clustering for the segmentation analyzing.
+
+```{r, message=FALSE, warning=FALSE}
+#' Load useful packages
+library(cluster) # for gower similarity and pam
+library(dplyr)
+library(ggplot2)
+library(readr)
+library(Rtsne) # for t-SNE plot
+```
+
+```{r}
+# Remove any missing value (i.e, NA values for not available)
+my_data <- na.omit(data_final)
+
+```
+```{r}
+# convert the entire dataframe to factor
+df_final <- data.frame(lapply(my_data, as.factor))
+
+```
+
+## A: K-Modes Clustering Categorical Data: Partitioning Around Medoids (PAM) algorithm
+
+#### 1: Calculating Distance -Gower distance
+
+In order for a clustering algorithm to yield sensible results, we have to use a distance metric that can handle mixed data types. In this case, we will use something called Gower distance.
+
+Now that the distance matrix has been calculated, it is time to select an algorithm for clustering. While many algorithms that can handle a custom distance matrix exist, partitioning around medoids (PAM) will be used here.
+
+```{r}
+#' Compute Gower distance
+set.seed(6)
+gower_dist <- daisy(df_final[,2:17], metric = "gower")
+gower_mat <- as.matrix(gower_dist)
+```
+
+
+###### Check attributes to ensure the correct methods are being used
+
+
+```{r}
+# Check attributes to ensure the correct methods are being used
+# N = nominal
+
+summary(gower_dist)
+```
+
+#### Print most similar clients
+
+
+```{r}
+# Print most similar clients
+df_final[which(gower_mat == min(gower_mat[gower_mat != min(gower_mat)]), arr.ind = TRUE)[1, ], ]
+
+# A tibble: 2x16
+```
+
+#### Print most dissimilar clients
+
+
+```{r}
+# Print most dissimilar clients
+df_final[which(gower_mat == max(gower_mat[gower_mat != max(gower_mat)]), arr.ind = TRUE)[1, ], ]
+# A tibble: 2 x 16
+    
+```
+
+
+#### 2: Determining Optimal Clusters:Silhouette coefficient
+
+A variety of metrics exist to help choose the number of clusters to be extracted in a cluster analysis. I will use silhouette width, an internal validation metric which is an aggregated measure of how similar an observation is to its own cluster compared its closest neighboring cluster. The metric can range from -1 to 1, where higher values are better. After calculating silhouette width for clusters ranging from 2 to 8 for the PAM algorithm, I see that 3 clusters yields the highest value.
+
+
+
+```{r}
+# Calculate silhouette width for many k using PAM.
+#search for a number of clusters both meaningful and easy to remember.Here is 2:8
+set.seed(6)
+sil_width <- c(NA)
+for(i in 2:8){  
+  pam_fit <- pam(gower_dist, diss = TRUE, k = i)  
+  sil_width[i] <- pam_fit$silinfo$avg.width  
+}
+
+# Plot sihouette width (higher is better)
+
+plot(1:8, sil_width,
+     xlab = "Number of clusters",
+     ylab = "Silhouette Width")
+lines(1:8, sil_width)
+
+```
+
+
+#### 3: Applying K-Modes(PAM model) and summary of each cluster
+
+```{r}
+# Applying K-Modes(PAM model) and summary of each cluster
+set.seed(6)
+k <- 3
+pam_fit <- pam(gower_dist, diss = TRUE, k)
+pam_results <- df_final[,2:17] %>%
+  mutate(cluster = pam_fit$clustering) %>%
+  group_by(cluster) %>%
+  do(the_summary = summary(.))
+
+```
+
+
+```{r}
+pam_results$the_summary
+```
+
+#### 4: Example of summary of each cluster
+
+Here one can attempt to derive some common patterns for clients within a cluster. 
+
+As an example:
+
+1: Cluster 1 
+is made of Male x age 25 to 34 x household size 2 x no kids x university udergraduate degree x employed/self-employed full-time x house income $50k -< $100k.
+
+2: Cluster 2
+is made of Male x age 45 to 54 and age 25 to 34 x household size 3 and 4 x yes kids x Completed college / technical school x Employed / self-employed full-time x house income $75k -< $100k and other.
+
+3: Cluster 3
+is made of Female x age 45 to 54 and  65+ x household size 1 and 2 x no kids x University undergraduate degree x Employed / self-employed full-time and retired x house income 50 -< 75k and (Other).
+
+
+#### 5: Visualization
+
+One way to visualize many variables in a lower dimensional space is with t-distributed stochastic neighborhood embedding, or t-SNE. This method is a dimension reduction technique that tries to preserve local structure so as to make clusters visible in a 2D or 3D visualization. While it typically utilizes Euclidean distance, it has the ability to handle a custom distance metric like the one we created above. In this case, the plot shows the three well-separated clusters that PAM was able to detect.
+
+```{r}
+tsne_obj <- Rtsne(gower_dist, is_distance = TRUE)
+tsne_data <- tsne_obj$Y %>%
+  data.frame() %>%
+  setNames(c("X", "Y")) %>%
+  mutate(cluster = factor(pam_fit$clustering))
+ggplot(aes(x = X, y = Y), data = tsne_data) +
+  geom_point(aes(color = cluster))
+```
+
+
+Although not perfect (especially cluster 1), colors are mostly located in similar areas, confirming the relevancy of the segmentation.
+
+
+## B:Hierarchical Clustering
+
+#### 1: Plot of Hierarchical Clustering
+
+```{r, message=FALSE}
+
+library(factoextra) # clustering visualization
+library(dendextend) # for comparing two dendrograms
+```
+```{r}
+# Hierarchcial clustering useing average
+set.seed(6)
+aggl_clust_c <- hclust(gower_dist, method = "average")
+plot(aggl_clust_c,
+     main = "Hierarchical clustering, average")
+```
+
+
+```{r}
+# Dendrogram
+fviz_dend(aggl_clust_c, rect = TRUE, show_labels = FALSE) 
+
+```
+
+
+####2: Determining Optimal Clusters: Silhouette method
+
+I will use same method as K-Modes for this optimal clusters. I see that 3 clusters yields the highest value. Hence, select k = 3
+
+
+```{r}
+# Cluster stats comes out as list while it is more convenient to look at it as a table
+# This code below will produce a dataframe with observations in columns and variables in row
+# Not quite tidy data, which will require a tweak for plotting, but I prefer this view as an output here as I find it more comprehensive
+
+library(fpc)
+cstats.table <- function(dist, tree, k) {
+clust.assess <- c("cluster.number","n","within.cluster.ss","average.within","average.between",
+                  "wb.ratio","dunn2","avg.silwidth")
+clust.size <- c("cluster.size")
+stats.names <- c()
+row.clust <- c()
+output.stats <- matrix(ncol = k, nrow = length(clust.assess))
+cluster.sizes <- matrix(ncol = k, nrow = k)
+for(i in c(1:k)){
+  row.clust[i] <- paste("Cluster-", i, " size")
+}
+for(i in c(2:k)){
+  stats.names[i] <- paste("Test", i-1)
+  
+  for(j in seq_along(clust.assess)){
+    output.stats[j, i] <- unlist(cluster.stats(d = dist, clustering = cutree(tree, k = i))[clust.assess])[j]
+    
+  }
+  
+  for(d in 1:k) {
+    cluster.sizes[d, i] <- unlist(cluster.stats(d = dist, clustering = cutree(tree, k = i))[clust.size])[d]
+    dim(cluster.sizes[d, i]) <- c(length(cluster.sizes[i]), 1)
+    cluster.sizes[d, i]
+    
+  }
+}
+output.stats.df <- data.frame(output.stats)
+cluster.sizes <- data.frame(cluster.sizes)
+cluster.sizes[is.na(cluster.sizes)] <- 0
+rows.all <- c(clust.assess, row.clust)
+# rownames(output.stats.df) <- clust.assess
+output <- rbind(output.stats.df, cluster.sizes)[ ,-1]
+colnames(output) <- stats.names[2:k]
+rownames(output) <- rows.all
+is.num <- sapply(output, is.numeric)
+output[is.num] <- lapply(output[is.num], round, 2)
+output
+}
+```
+
+```{r}
+#note here: long time of running these codes
+ggplot(data = data.frame(t(cstats.table(gower_dist, aggl_clust_c, 10))), 
+  aes(x=cluster.number, y=avg.silwidth)) + 
+  geom_point()+
+  geom_line()+
+  ggtitle("Hierarchical Clustering") +
+  labs(x = "Num.of clusters", y = "Average silhouette width") +
+  theme(plot.title = element_text(hjust = 0.5))
+```
+
+
+I see k=3 is an appropriate number of clusters. Let's try k=3
+
+#### 3: Applying hierarchical clustering and summary of each cluster
+
+
+```{r}
+# Applying hierarchical clustering and summary of each cluster
+set.seed(6)
+k <- 3
+hc_fit <- cutree(aggl_clust_c, k)
+hc_results <- df_final[,2:17] %>%
+  mutate(cluster = hc_fit) %>%
+  group_by(cluster) %>%
+  do(the_summary = summary(.))
+```
+
+```{r}
+hc_results$the_summary
+```
+
+#### 4 Visualize the result in a scatter plot
+
+```{r}
+gcut<-cutree(aggl_clust_c,3)
+
+#use fviz_culster function to visualize the result in a scatter plot
+fviz_cluster(list(data= gower_dist,cluster=gcut))
+```
+
+
+## Clustering validation
+
+In this section, we’ll use cluster.stats() [in fpc package] for comparison between two clusterings. 
+
+The cluster.stats() computing a number of distance based statistics which can be used either for cluster validation, comparison between clustering and decision about the number of clusters.
+
+```{r}
+# Compute pairwise-distance matrices
+dd <- dist(gower_dist, method ="euclidean")
+```
+
+####1: Cluster statistics for PAM clustering
+
+
+```{r}
+# Statistics for pam clustering
+pam_stats <- cluster.stats(dd,  pam_fit$cluster)
+
+```
+
+pam within clusters sum of squares
+
+```{r}
+# (pam) within clusters sum of squares
+pam_stats$within.cluster.ss
+```
+
+pam cluster average silhouette widths
+
+```{r}
+# (pam) cluster average silhouette widths
+pam_stats$clus.avg.silwidths
+```
+
+pam average distance within clusters
+
+```{r}
+#average distance within clusters. We want it to be as small as possible
+pam_stats$average.within
+```
+
+Number of points in each cluster
+
+```{r}
+#vector containing the number of points in each cluster
+pam_stats$cluster.size 
+```
+
+
+#### Cluster statistics for hierarchical clustering
+
+```{r}
+# Statistics for Hierarchical clustering
+hc_stats <- cluster.stats(dd, gcut)
+```
+
+
+(HCLUST) within clusters sum of squares
+
+```{r}
+# (HCLUST) within clusters sum of squares
+hc_stats$within.cluster.ss
+```
+
+(HCLUST) cluster average silhouette widths
+
+```{r}
+# (HCLUST) cluster average silhouette widths
+hc_stats$clus.avg.silwidths
+```
+
+(HCLUST) average distance within clusters
+
+```{r}
+
+#average distance within clusters. We want it to be as small as possible
+hc_stats$average.within
+```
+
+number of points in each cluste
+
+```{r}
+#vector containing the number of points in each cluster
+hc_stats$cluster.size 
+```
+
+
+#### Comparison of two clusterings
+
+I use some values from running cluster.stats() for the two clusterings comparison.
+
+##### Comparison of cluster average silhouette widths
+
+
+
+K-Modes (PAM) Clustering              |             Hierarchical Clustering 
+------------|-----------|-------------|----------------|-------------|------------
+    1       |        2  |       3     |           1    |      2      |    3 
+0.06313989  |0.05450466 |0.05104908   |     0.003739411| 0.245207077 | 0.381521770 
+
+* For K-Modes, average silhouette for each cluster is greater than 0.05.
+ 
+* For HCLUST, average silhouette for cluster 1 is very low just about 0.0037, but from summary of cluster, we saw majority of oberservations(1492) are in cluster 1. This means that many points have a very low value, then the clustering configuration may have too many or too few clusters.
+ 
+##### Comparison of average distance within clusters
+
+K-Modes (PAM) Clustering             |                Hierarchical Clustering
+-------------------------------------|--------------------------------------------
+      5.513666                       |                  5.879817
+      
+      
+Hierarchical clustering has higher number than K-Modes. That means hierarchical clustering is not good as K-Modes clustering.
+
+##### Conclusion of Comparison
+
+After comparison, I decided to use K-Modes(PAM) clustering. Due to many categorical variables in the data, the clustering result are not as good as we expect it, but it did give us useful values for the podcast industry. We can combine the clustering analyzing results with some other further analyzing, it will definitely help the company to project their advertisments to the target listeners. 
+
+######PAM has the following caracteristics:
+* Pros: it’s intuitive, more robust to noise and outliers compared to k-means (due to the properties of distances being used), and it produces a “typical individual” for each cluster (useful for interpretation).
+
+* Cons: it’s time consuming and computer intensive (run time and memory are quadratic).
+
