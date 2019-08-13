@@ -3,7 +3,6 @@ title: "Canadian Podcast Listeners 2018 Data Analyzing - Sprint 2"
 author: "Aimin Amy Hu"
 date: '2019-07-24'
 output: pdf_document
-always_allow_html: yes
 ---
 
 ```{r setup, include=FALSE}
@@ -166,22 +165,26 @@ ggplot(listener_clean,aes(x=arfhhs, fill =arfkid))+
 
 arfeduc: highest education
 
+
 ```{r}
 
 ggplot(listener_clean,aes(x=arfeduc, fill =arfeduc))+
-  theme_bw()+
+  theme(axis.text.x = element_text(angle=60))+
   geom_bar()+
   labs(y="Respondent Count",
        title="Respondent by Highest Education")
 
 ```
 
+
+
+
 ##### Observation from the plot
 
 1: The hightest number of respondents is 410 with University undergraduate degree.
 2: The second hightest number of respondents is 300 with Completed college/technical school.
 3: There are about 260 respondents who have Post-graduate degree.
-4: There are about 250respondents with High school graduate or Some high school or Elementary/grade school.
+4: There are about 250 respondents with High school graduate or Some high school or Elementary/grade school.
 
 #### G: Visualzation of respondents' Work Status
 
@@ -189,13 +192,16 @@ arfwork: work status
 
 ```{r}
 
-ggplot(listener_clean,aes(x=arfwork, fill =arfwork))+
-  theme_bw()+
+ggplot(listener_clean,aes(x=arfwork, fill = arfwork))+
+  theme(axis.text.x = element_text(angle=60))+
   geom_bar()+
   labs(y="Respondent Count",
        title="Respondent by Work Status")
 
 ```
+
+
+
 
 ##### Observation from the plot
 
@@ -211,7 +217,7 @@ arfhhi: household income before tax
 ```{r}
 
 ggplot(listener_clean,aes(x=arfhhi, fill =arfhhi))+
-  theme_bw()+
+  theme(axis.text.x = element_text(angle=60))+
   geom_bar()+
   labs(y="Respondent Count",
        title="Respondent by Household Income Before Tax")
@@ -277,7 +283,7 @@ podcast_last_month %>%
   filter(qp4nma !="Don't know" & qp4nma !="N/A, None") %>% # not include qp4nma ="Don't know" and NA
   top_n(10,wt = podcast_count) %>% 
   select(qp4nma, podcast_count) %>% 
-  datatable(class = "nowrap hover row-border", escape = FALSE, options = list(dom = 't',scrollX = TRUE, autoWidth = FALSE))
+  as.data.frame
 
 ```
 
@@ -635,7 +641,7 @@ genres_last_month <- summarize(genres_group, number_of_podcasts = n())
 
 
 ```{r}
-##Top 10 genres (command it out due to an issue for knit to PDF file)
+##Top 10 genres
 #genres_last_month %>% 
  # arrange(-number_of_podcasts) %>% 
  # filter(qp4gnaa !="Not recorded" & qp4gnaa !="") %>% # not include qp4gnaa ="Not recorded" and NA
@@ -734,7 +740,7 @@ qs4: frequency listening to audio podcasts
 ```{r}
 
 ggplot(listener_clean,aes(x=qs4, fill =arfgen))+
-  theme_bw()+
+  theme(axis.text.x = element_text(angle=15))+
   geom_bar()+
   labs(y="Respondent Count",
        title="Respondent by Frequency")
