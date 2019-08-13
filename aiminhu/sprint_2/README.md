@@ -5,20 +5,20 @@
 
 ### 2: Libraries that you will need to load:
 
-library(data.table)
-library(dplyr)
-library(tidyr)
-library(ggplot2)
-library(stringr)
-library(DT)
-library(knitr)
-library(grid)
-library(gridExtra)
-library(corrplot)
-library(methods)
-library(Matrix)
-library(reshape2)
-library(kableExtra)
+* library(data.table)
+* library(dplyr)
+* library(tidyr)
+* library(ggplot2)
+* library(stringr)
+* library(DT)
+* library(knitr)
+* library(grid)
+* library(gridExtra)
+* library(corrplot)
+* library(methods)
+* library(Matrix)
+* library(reshape2)
+* library(kableExtra)
 
 ### 3: A R markdown code file is here. You will need podcast18.csv to run this code. Unfortunately, this csv file is not loaded here due to a confidentical policy.
 
