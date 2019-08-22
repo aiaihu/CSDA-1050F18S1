@@ -201,8 +201,6 @@ ggplot(listener_clean,aes(x=arfwork, fill = arfwork))+
 ```
 
 
-
-
 ##### Observation from the plot
 
 1:More than 55%  of respondents (is about 890 people) are employed/self-employed full-time.
@@ -627,6 +625,14 @@ data_genres[is.na(data_genres$qp4gnaa),]
 ```
 
 There are still 35 NAs in variable qp4gnaa. Since respondents did not select/list podcast names in variable qp4nma, I will just keep these 35 NAs in the data.
+
+```{r}
+#save the data for using in sprint 3(this will save time for replaceing missig values)
+# Write CSV in R
+write.csv(listener_clean, file = "listener_clean.csv")
+
+```
+
 
 ##### use group_by genres of podcasts to see how many genres of podcasts in the data.
 

@@ -104,7 +104,7 @@ names(listener_df)[variables_with_allNA]
 
 We see there are 184 variables (columns) in the dataset have NA for all values. This tells us that there is no any responses to these survey questions. As a company to rely on survey to get data, lack of response will definitely affect the data quality. Hence, the company should review these survey questions, make changes or remove these questions for the future survey.
 
-To keep the data clean for later use, we will subset dataset without these 183 variables.
+To keep the data clean for later use, we will subset dataset without these 184 variables.
 
 ```{r}
 #remove columns with all values are NA
