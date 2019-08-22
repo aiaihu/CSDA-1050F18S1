@@ -14,62 +14,27 @@
    - How listeners react to the advertising in podcasts?
 
 ## Language: R
-
-## Method: K-Modes Clustering for the segementation
+RStudio version 3.5.1
 
 ## Libraries
-library(data.table)
-library(dplyr)
-library(tidyr)
-library(ggplot2)
-library(stringr)
-library(DT)
-library(knitr)
-library(grid)
-library(gridExtra)
-library(corrplot)
-library(methods)
-library(Matrix)
-library(reshape2)
-library(kableExtra)
-library(cluster) # for gower similarity and pam
-library(readr)
-library(Rtsne) # for t-SNE plot
+* library(data.table)
+* library(dplyr)
+* library(tidyr)
+* library(ggplot2)
+* library(stringr)
+* library(DT)
+* library(knitr)
+* library(grid)
+* library(gridExtra)
+* library(corrplot)
+* library(methods)
+* library(Matrix)
+* library(reshape2)
+* library(kableExtra)
+* library(cluster) # for gower similarity and pam
+* library(readr)
+* library(Rtsne) # for t-SNE plot
 
-Here you will outline your entire project. Detail the purpose, background on the project, and contents found here. 
+## Data
+Data for this project was from Audience Insights Inc. Due to the confidential policy,data is not available here. Hence, R files are unable to run. However, all results are on the PDF file.
 
-  - This should include how to install dependecies and run the project from start to finish
-  - Use proper formatting here - make it look pretty
-  - Magic, not how I want to see the results appear
-
-# Updates Limitations Requirements?
-
-  - If you have data here - put it in it's own data folder. If it's downloadable link to it. 
-  - Don't post passwords, usernames, or private information here.
-
-
-You can also:
-  - Link files from GitHub, Dropbox, Google Drive and One Drive..the web etc. 
-  - Be creative and look around GitHub for great "Readme.md" examples. 
- 
-* [Google] - its your friend for Markdown editors and syntax
-
-
-### Installation
-
-Often these have explicit directions per platform. If you're using anaconda/python make sure to list the versions/libraies. 
-e.g., Install the dependencies and devDependencies and start the server.
-
-```sh
-$ cd data
-$ npm install -d
-$ node app
-```
-
-For production environments...
-
-```
-conda install -c conda-forge tensorflow-gpu
-pip install pandas
-etc. etc. 
-```
